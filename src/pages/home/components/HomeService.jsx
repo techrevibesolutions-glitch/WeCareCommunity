@@ -21,7 +21,8 @@ const HomeService = () => {
       title: "In-Home Support",
       description: "Designed to support your independence while ensuring you get the help you need with daily tasks.",
       image: img3,
-      link: "/services/inhomesupport"
+      link: "/services/inhomesupport",
+      
     }
   ];
 
