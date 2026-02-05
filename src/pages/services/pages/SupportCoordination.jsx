@@ -22,7 +22,7 @@ function SupportCoordination() {
   const para3 = "If you need assistance creating or understanding your NDIS plan, we’re here to help. At We Care Community, our top priority is supporting you to pursue your goals, make informed decisions, and design a plan that reflects your individual needs and lifestyle. We are committed to giving you the tools and confidence to define your own path and live life your way."
   const imgTitle = "Cordination of Support COS"
   const planTitle = "How Our Support Coordinator can assist you"
-  const providerTitle = "";
+  const providerTitle = "Service Providers";
   const planItems = [
   "Establish connections between you and community, mainstream, and government services.",
   "Help you develop the ability to make your own decisions.",
