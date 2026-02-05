@@ -41,7 +41,7 @@ const Footer = () => {
                 <span className="font-semibold block mt-2 text-gray-800">
                   Goulburn Day Program Centre:
                 </span>
-                149 Kinghorne St Goulburn 2580
+                149 Kinghorne St Goulburn, NSW 2580
                 <br />
                 <span className="font-semibold block mt-2 text-gray-800">
                   Other Services Area:

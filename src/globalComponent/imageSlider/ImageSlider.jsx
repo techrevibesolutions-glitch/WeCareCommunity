@@ -44,7 +44,7 @@ const ImageSlider = ({ images, imgTitle, interval = 3000 }) => {
             src={img}
             loading={i === index ? "eager" : "lazy"}
             alt={imgTitle}
-            className="h-full  w-full object-cover object-top-left"
+            className="h-full   w-full object-cover"
           />
         ))}
       </div>

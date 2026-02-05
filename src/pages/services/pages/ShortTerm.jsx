@@ -2,6 +2,7 @@ import React from 'react'
 import Hero from '../../../globalComponent/herosection/Hero';
 import ServiceTemplate from '../../../globalComponent/seviceTem/ServiceTemplate';
 import img from "../../../assets/house/1.jpg";
+import SupportCordination from '../../../globalComponent/seviceTem/SupportCordination';
 function ShortTerm() {
   const heading ="Short Term Accommodation"
   const heading1 = "Short-Term \n Accommodation STA"
@@ -45,7 +46,7 @@ function ShortTerm() {
   return (
     <>
     <Hero heading={heading} para={para}/>
-    <ServiceTemplate heading={heading1} para1={para1} para2={para2} para3={para3} imgTitle={imgTitle} img={img} planItems={planItems} providerItems={providerItems} planTitle={planTitle} providerTitle={providerTitle} highlightedWords={highlightedWords} />
+    <SupportCordination/>
     </>
   )
 }
