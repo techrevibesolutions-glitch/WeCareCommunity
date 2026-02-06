@@ -77,13 +77,14 @@ const Footer = () => {
               </h3>
               <div className="text-gray-600 text-lg space-y-2">
                 <p className="hover:text-blue-800 transition-colors">
-                  <a href="mailto:info@wecarecommunity.com.au">
+                  <a 
+                  href="mailto:info@wecarecommunity.com.au?subject=Enquiry%20from%20Website">
                     info@wecarecommunity.com.au
                   </a>
                 </p>
                 <p className="hover:text-blue-800 transition-colors">
                   <a
-                    href="https://wa.me/1800371070"
+                    href="tel:1800371070"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="cursor-pointer"

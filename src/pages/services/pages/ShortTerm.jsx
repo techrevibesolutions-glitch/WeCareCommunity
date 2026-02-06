@@ -57,6 +57,11 @@
 
 import React from "react";
 import img from "../../../assets/house/1.jpg";
+import Hero from "../../../globalComponent/herosection/Hero";
+
+
+const heading = "Short Term Accommodation"
+const para = "STA lets you try new activities, meet new people, and learn new skills, while also giving your family or carers a much-needed break."
 
 const highlightedWords = [
   "We Care Community",
@@ -110,6 +115,7 @@ const getHighlightedText = (text, words) => {
 function ShortTerm() {
   return (
     <>
+    <Hero heading={heading} para={para} />
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-6 py-12 lg:py-20">
         <div className="flex flex-col lg:flex-row gap-8 items-center justify-center">
