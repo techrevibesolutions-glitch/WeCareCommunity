@@ -185,7 +185,7 @@ useEffect(() => {
             )}
           </div>
 
-          {/* Reference ID */}
+          {/* Reference ID
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Reference ID
@@ -196,7 +196,7 @@ useEffect(() => {
               
               className="mt-1 w-full border border-gray-300 rounded-md p-2 bg-gray-100"
             />
-          </div>
+          </div> */}
 
           {/* Name Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
