@@ -6,24 +6,116 @@ import axios from "axios";
 
 // Validation Schema
 const formSchema = z.object({
-  firstName: z.string().min(2, "First name is required"),
-  lastName: z.string().min(2, "Last name is required"),
-  dob: z.string().min(1, "Date of Birth is required"),
-  street: z.string().min(1, "Street address is required"),
-  city: z.string().min(1, "City is required"),
-  state: z.string().min(1, "State is required"),
-  zip: z.string().min(1, "Zip is required"),
-  phone: z.string().min(10, "Valid phone number is required"),
-  email: z.string().email("Invalid email address").or(z.string().length(0)),
-  ndis: z.string().min(1, "NDIS number is required"),
+  firstName: z
+    .string({
+      required_error: "First name is required",
+      invalid_type_error: "First name is required",
+    })
+    .min(2, "First name is required"),
+
+  lastName: z
+    .string({
+      required_error: "Last name is required",
+      invalid_type_error: "Last name is required",
+    })
+    .min(2, "Last name is required"),
+
+  dob: z
+    .string({
+      required_error: "Date of Birth is required",
+      invalid_type_error: "Date of Birth is required",
+    })
+    .min(1, "Date of Birth is required"),
+
+  street: z
+    .string({
+      required_error: "Street address is required",
+      invalid_type_error: "Street address is required",
+    })
+    .min(1, "Street address is required"),
+
+  city: z
+    .string({
+      required_error: "City is required",
+      invalid_type_error: "City is required",
+    })
+    .min(1, "City is required"),
+
+  state: z
+    .string({
+      required_error: "State is required",
+      invalid_type_error: "State is required",
+    })
+    .min(1, "State is required"),
+
+  zip: z
+    .string({
+      required_error: "Zip code is required",
+      invalid_type_error: "Zip code is required",
+    })
+    .min(1, "Zip code is required")
+    .regex(/^\d+$/, "Zip code must contain only numbers"),
+
+  phone: z
+    .string({
+      required_error: "Phone number is required",
+      invalid_type_error: "Phone number is required",
+    })
+    .min(10, "Phone number must be at least 10 digits")
+    .regex(/^\d+$/, "Phone must contain only numbers"),
+
+  email: z
+    .string({
+      required_error: "Email is required",
+      invalid_type_error: "Email is required",
+    })
+    .min(1, "Email is required")
+    .email("Invalid email address"),
+
+  ndis: z
+    .string({
+      required_error: "NDIS number is required",
+      invalid_type_error: "NDIS number is required",
+    })
+    .min(1, "NDIS number is required"),
+
   fundManaged: z.string().optional(),
+
   planManager: z.string().optional(),
+
   service: z.string().optional(),
+
   comments: z.string().optional(),
-  recommend: z.enum(["Yes", "No", "Maybe"]),
-  referrerType: z.enum(["", "self", "someone"]),
-  consentStatement1: z.boolean().refine((val) => val === true),
-  consentStatement2: z.boolean().refine((val) => val === true),
+
+  recommend: z
+    .string({
+      required_error: "Please select recommendation option",
+      invalid_type_error: "Please select recommendation option",
+    })
+    .min(1, "Please select recommendation option"),
+
+  referrerType: z
+    .string({
+      required_error: "Please select referrer type",
+      invalid_type_error: "Please select referrer type",
+    })
+    .min(1, "Please select referrer type"),
+
+    consentStatement1: z.literal(true, {
+      errorMap: () => ({
+        message:
+          "You must acknowledge that submitting this form does not guarantee access to WCC services.",
+      }),
+    }),
+    
+    consentStatement2: z.literal(true, {
+      errorMap: () => ({
+        message:
+          "You must acknowledge that the information provided will remain confidential and used internally by WCC.",
+      }),
+    }),
+    
+
   references: z.array(
     z.object({
       name: z.string().optional(),
@@ -31,7 +123,8 @@ const formSchema = z.object({
       contact: z.string().optional(),
     })
   ),
-  refId: z.string(),
+
+  refId: z.string().optional(),
 });
 
 const SCRIPT_URL =
@@ -41,7 +134,6 @@ const Form = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [nextRefId, setNextRefId] = useState("");
 
-  // Default form values
   const defaultValues = {
     refId: "",
     referrerType: "",
@@ -80,31 +172,59 @@ const Form = () => {
     defaultValues,
   });
 
-
-
-// Fetch next Ref ID from Apps Script
-useEffect(() => {
-  async function fetchRefId() {
-    try {
-      const res = await axios.get(SCRIPT_URL); // doGet returns { nextRefId }
-      if (res.data?.nextRefId) {
-        setValue("refId", res.data.nextRefId); // ⚡ Correct way
-      }
-    } catch (err) {
-      console.error("Failed to fetch Ref ID:", err);
-    }
-  }
-  fetchRefId();
-}, [setValue]);
-
   const { fields } = useFieldArray({ control, name: "references" });
+
+  // Fetch next Ref ID from Apps Script
+  useEffect(() => {
+    async function fetchRefId() {
+      try {
+        const res = await axios.get(SCRIPT_URL);
+        if (res.data?.nextRefId) {
+          setValue("refId", res.data.nextRefId);
+        }
+      } catch (err) {
+        console.error("Failed to fetch Ref ID:", err);
+      }
+    }
+    fetchRefId();
+  }, [setValue]);
+
+  // ✅ Auto-scroll to first error
+  useEffect(() => {
+    const findErrorField = (errorsObj, parentKey = "") => {
+      for (const key in errorsObj) {
+        const field = parentKey ? `${parentKey}.${key}` : key;
+
+        if (errorsObj[key]?.message) return field;
+
+        if (typeof errorsObj[key] === "object") {
+          const nested = findErrorField(errorsObj[key], field);
+          if (nested) return nested;
+        }
+      }
+      return null;
+    };
+
+    const firstErrorField = findErrorField(errors);
+
+    if (firstErrorField) {
+      const element = document.querySelector(`[name="${firstErrorField}"]`);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        element.focus();
+      }
+    }
+  }, [errors]);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
       const formData = new URLSearchParams();
       Object.entries(data).forEach(([key, value]) => {
-        formData.append(key, Array.isArray(value) ? JSON.stringify(value) : value ?? "");
+        formData.append(
+          key,
+          Array.isArray(value) ? JSON.stringify(value) : value ?? ""
+        );
       });
 
       const response = await axios.post(SCRIPT_URL, formData, {
@@ -113,34 +233,7 @@ useEffect(() => {
 
       if (response.data.status === "success") {
         alert(`Form submitted successfully! Ref ID: ${response.data.refId}`);
-        reset({
-          firstName: "",
-          lastName: "",
-          dob: "",
-          street: "",
-          city: "",
-          state: "",
-          zip: "",
-          phone: "",
-          email: "",
-          ndis: "",
-          fundManaged: "",
-          planManager: "",
-          service: "",
-          comments: "",
-          recommend: "",
-          consentStatement1: "",
-          consentStatement2: "",
-          references: [
-            { name: "", address: "", contact: "" },
-            { name: "", address: "", contact: "" }
-          ],
-          referrerType: "",
-          status: "",
-          subStatus: "",
-          remarks: "",
-        });
-      
+        reset(defaultValues);
       } else {
         alert("Error: " + response.data.message);
       }
@@ -160,6 +253,7 @@ useEffect(() => {
         </h1>
 
         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          {/* ---------- FULL FORM BLOCK (all your existing code) ---------- */}
           {/* Referrer Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -244,6 +338,11 @@ useEffect(() => {
               {...register("dob")}
               className="mt-1 w-full border border-gray-300 rounded-md p-2"
             />
+             {errors.dob && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.dob.message}
+                </p>
+              )}
           </div>
 
           {/* Address Section */}
@@ -316,7 +415,7 @@ useEffect(() => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                E-mail
+                E-mail *
               </label>
               <input
                 {...register("email")}
@@ -324,6 +423,11 @@ useEffect(() => {
                   errors.email ? "border-red-500" : "border-gray-300"
                 } rounded-md p-2`}
               />
+                {errors.email && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -339,6 +443,12 @@ useEffect(() => {
                   errors.ndis ? "border-red-500" : "border-gray-300"
                 } rounded-md p-2`}
               />
+               {errors.ndis && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.ndis.message}
+                </p>
+              )}
+
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
@@ -475,57 +585,53 @@ useEffect(() => {
               Consent for Request for Service
             </h3>
             <p className="text-gray-700 mb-2">
-              To help BGF process your enquiry, please acknowledge each
+              To help WCC process your enquiry, please acknowledge each
               statement below:
             </p>
 
-            {/* Statement 1 */}
-            <div className="mb-4 flex items-center space-x-2">
-              <input
-                type="checkbox"
-                {...register("consentStatement1", {
-                  required: "Please acknowledge statement 1",
-                })}
-                id="consentStatement1"
-                className="w-4 h-4"
-              />
-              <label
-                htmlFor="consentStatement1"
-                className="text-gray-700 text-sm cursor-pointer"
-              >
-                * Submitting this form does not guarantee access to BGF
-                services.
-              </label>
-            </div>
-            {errors.consentStatement1 && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.consentStatement1.message}
-              </p>
-            )}
+{/* Statement 1 */}
+<div className="mb-4 flex items-center space-x-2">
+  <input
+    type="checkbox"
+    {...register("consentStatement1", { valueAsBoolean: true })}
+    id="consentStatement1"
+    className="w-4 h-4"
+  />
+  <label
+    htmlFor="consentStatement1"
+    className="text-gray-700 text-sm cursor-pointer"
+  >
+    * Submitting this form does not guarantee access to WCC services.
+  </label>
+</div>
+{errors.consentStatement1 && (
+  <p className="text-red-500 text-sm mt-1">
+    Please acknowledge the consent.
+  </p>
+)}
 
-            {/* Statement 2 */}
-            <div className="mb-4 flex items-center space-x-2">
-              <input
-                type="checkbox"
-                {...register("consentStatement2", {
-                  required: "Please acknowledge statement 2",
-                })}
-                id="consentStatement2"
-                className="w-4 h-4"
-              />
-              <label
-                htmlFor="consentStatement2"
-                className="text-gray-700 text-sm cursor-pointer"
-              >
-                * Information provided will remain confidential within BGF and
-                used internally to coordinate appropriate support services.
-              </label>
-            </div>
-            {errors.consentStatement2 && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.consentStatement2.message}
-              </p>
-            )}
+{/* Statement 2 */}
+<div className="mb-4 flex items-center space-x-2">
+  <input
+    type="checkbox"
+    {...register("consentStatement2", { valueAsBoolean: true })}
+    id="consentStatement2"
+    className="w-4 h-4"
+  />
+  <label
+    htmlFor="consentStatement2"
+    className="text-gray-700 text-sm cursor-pointer"
+  >
+    * Information provided will remain confidential within WCC and used internally to coordinate appropriate support services.
+  </label>
+</div>
+{errors.consentStatement2 && (
+  <p className="text-red-500 text-sm mt-1">
+    Please acknowledge the consent.
+  </p>
+)}
+
+
           </div>
 
           <div className="pt-6 text-center">
