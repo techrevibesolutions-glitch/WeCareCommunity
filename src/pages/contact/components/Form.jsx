@@ -6,10 +6,30 @@ import axios from 'axios';
 
 // 1. Define the Validation Schema
 const contactSchema = z.object({
-  name: z.string().min(2, "Full name is required (min 2 chars)"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  email: z.string().email("Please enter a valid email address"),
-  message: z.string().min(10, "Message must be at least 10 characters long"),
+  name: z
+    .string()
+    .trim()
+    .min(3, "Full name must be at least 3 characters")
+    .regex(/^[a-zA-Z\s'-]+$/, "Name can only contain letters"),
+
+  phone: z
+    .string()
+    .trim()
+    .regex(
+      /^(?:\+61|0)[2-9]\d{8}$/,
+      "Enter a valid Australian phone number"
+    ),
+
+  email: z
+    .string()
+    .trim()
+    .email("Please enter a valid email address"),
+
+  message: z
+    .string()
+    .trim()
+    .min(10, "Message must be at least 10 characters")
+    .max(500, "Message cannot exceed 500 characters"),
 });
 
 function Form() {
@@ -25,7 +45,7 @@ function Form() {
 
   // 3. Handle Form Submission with Axios
   const onSubmit = async (data) => {
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybtrK9qZTb47gXLeaQiim5yxZsqeaCLm-g7x3zcHn9ua7HNdBHqx9yitATnCY-p9jonw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAwPma59MJvxN-iqBwxpHtRL3vkYeSw0KTbvgfZP8QeSV2K6MCiycldjG6e58D3k1e/exec";
 
     try {
       // Using Axios for the POST request
